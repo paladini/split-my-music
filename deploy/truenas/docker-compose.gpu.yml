@@ -1,0 +1,8 @@
+# Use with deploy/truenas/docker-compose.yml. Image must be built from Dockerfile.gpu.
+services:
+  split-my-music:
+    image: split-my-music:gpu
+    gpus: all
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility

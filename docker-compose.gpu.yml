@@ -1,0 +1,14 @@
+# NVIDIA GPU override. Use together with docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# Host needs: NVIDIA driver + NVIDIA Container Toolkit.
+
+services:
+  split-my-music:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: split-my-music:gpu
+    gpus: all
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility

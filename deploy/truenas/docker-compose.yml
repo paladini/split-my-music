@@ -1,0 +1,12 @@
+# TrueNAS SCALE / NAS template (CPU). Build the image first or point `image:` to your registry.
+# GPU: also add the override file next to it (docker-compose.gpu.yml) and an image built from Dockerfile.gpu.
+services:
+  split-my-music:
+    image: split-my-music:cpu
+    container_name: split-my-music
+    ports:
+      - "7860:7860"
+    volumes:
+      - /mnt/tank/apps/split-my-music/models:/data/models
+      - /mnt/tank/apps/split-my-music/jobs:/data/jobs
+    restart: unless-stopped

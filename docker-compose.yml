@@ -1,0 +1,31 @@
+# CPU (default):
+#   docker compose up -d --build
+#
+# NVIDIA GPU: use the override file; it REPLACES this service (one container, port 7860):
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# Never run both variants at the same time on the same port.
+
+services:
+  split-my-music:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: split-my-music:cpu
+    container_name: split-my-music
+    ports:
+      - "${SPLIT_PUBLISH_PORT:-7860}:7860"
+    volumes:
+      - model-cache:/data/models        # AI models (downloaded once, kept across updates)
+      - ./data/jobs:/data/jobs          # finished results, visible on the host
+    environment:
+      SPLIT_MAX_UPLOAD_MB: "${SPLIT_MAX_UPLOAD_MB:-200}"
+      SPLIT_MAX_DURATION_MINUTES: "${SPLIT_MAX_DURATION_MINUTES:-20}"
+      SPLIT_MAX_CONCURRENT_JOBS: "${SPLIT_MAX_CONCURRENT_JOBS:-1}"
+      SPLIT_MAX_QUEUE_SIZE: "${SPLIT_MAX_QUEUE_SIZE:-5}"
+      SPLIT_RETENTION_HOURS: "${SPLIT_RETENTION_HOURS:-24}"
+      SPLIT_MIN_FREE_DISK_MB: "${SPLIT_MIN_FREE_DISK_MB:-500}"
+      SPLIT_LOG_LEVEL: "${SPLIT_LOG_LEVEL:-INFO}"
+    restart: unless-stopped
+
+volumes:
+  model-cache:

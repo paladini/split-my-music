@@ -1,0 +1,46 @@
+# NVIDIA GPU image. Requires an NVIDIA driver and the NVIDIA Container Toolkit on the host.
+# NOTE: this image has NOT been run on NVIDIA hardware by the maintainers yet (see README).
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+    SPLIT_HOST=0.0.0.0 \
+    SPLIT_PORT=7860 \
+    SPLIT_MODEL_CACHE_DIR=/data/models \
+    SPLIT_JOBS_DIR=/data/jobs \
+    TORCH_HOME=/data/models/torch
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      software-properties-common ffmpeg libsndfile1 \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends python3.12 python3.12-venv \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3.12 -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+COPY requirements.txt .
+# CUDA PyTorch first, then everything except the CPU extra, then the GPU extra.
+RUN pip install torch --index-url https://download.pytorch.org/whl/cu126 \
+    && grep -viE '^audio-separator' requirements.txt > /tmp/req.txt \
+    && pip install -r /tmp/req.txt \
+    && pip install "audio-separator[gpu]>=0.48.0"
+
+COPY main.py ./
+COPY src ./src
+COPY static ./static
+COPY templates ./templates
+
+RUN mkdir -p /data/models /data/jobs
+VOLUME ["/data/models", "/data/jobs"]
+EXPOSE 7860
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/health', timeout=8)" || exit 1
+
+CMD ["python", "main.py"]
