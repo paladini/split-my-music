@@ -1,1 +1,132 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Split My Music</title></head><body><h1>Split My Music</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Split My Music — separate vocals and instruments</title>
+  <meta name="description" content="Self-hosted tool to separate vocals, music and instruments from your songs. Everything runs on your own server.">
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="hero">
+    <div class="wrap hero-inner">
+      <div class="brand">
+        <img src="/static/img/favicon.svg" alt="" width="44" height="44">
+        <div>
+          <h1>Split My Music</h1>
+          <p class="tagline">Pull a song apart: vocals, music, drums, bass and more.</p>
+        </div>
+      </div>
+      <ul class="badges" aria-label="Server information">
+        <li class="badge" id="deviceBadge">Checking device…</li>
+        <li class="badge">Runs on your own server</li>
+        <li class="badge">Models are saved for next time</li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section id="setup" aria-labelledby="setupTitle">
+      <h2 id="setupTitle" class="sr-only">Set up your separation</h2>
+      <form id="form" novalidate>
+
+        <fieldset class="step">
+          <legend><span class="num">1</span> Choose a song</legend>
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-describedby="dropHelp" aria-label="Choose an audio file, or drop one here">
+            <input id="fileInput" type="file" accept=".mp3,.wav,.flac,.m4a,.aac,.ogg,.opus,audio/*" hidden>
+            <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <p class="drop-main" id="dropMain">Drop an audio file here, or <span class="link">browse</span></p>
+            <p class="muted" id="dropHelp">MP3, WAV, FLAC, M4A, AAC, OGG or OPUS · up to <span id="limitMb">200</span> MB · <span id="limitMin">20</span> minutes</p>
+          </div>
+          <p id="fileInfo" class="file-info" hidden></p>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="num">2</span> What do you want to separate?</legend>
+          <div id="goals" class="goals" role="radiogroup" aria-label="Separation goal"></div>
+          <div class="tracks-block">
+            <p class="label" id="tracksLabel">Files you will get</p>
+            <div id="tracks" class="pills" role="group" aria-labelledby="tracksLabel"></div>
+          </div>
+        </fieldset>
+
+        <fieldset class="step">
+          <legend><span class="num">3</span> File format</legend>
+          <div id="formats" class="segmented" role="radiogroup" aria-label="Output format"></div>
+          <p id="formatHelp" class="muted"></p>
+
+          <details class="advanced">
+            <summary>Advanced: choose the AI model</summary>
+            <div class="advanced-body">
+              <label for="modelSelect" class="label">Model</label>
+              <select id="modelSelect"></select>
+              <div id="modelInfo" class="model-info" aria-live="polite"></div>
+              <p class="muted">Only tested models are listed. Each one only offers the files it can really create.</p>
+            </div>
+          </details>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" id="startBtn" class="btn primary" disabled>Split my song</button>
+          <p id="startHint" class="muted">Choose a song to begin.</p>
+        </div>
+      </form>
+    </section>
+
+    <section id="progress" class="panel" hidden aria-labelledby="progTitle">
+      <h2 id="progTitle">Working on it…</h2>
+      <ol id="stages" class="stages">
+        <li data-stage="uploading">Upload</li>
+        <li data-stage="preparing">Prepare audio</li>
+        <li data-stage="downloading_model">Get the AI model</li>
+        <li data-stage="separating">Separate</li>
+        <li data-stage="exporting">Save files</li>
+      </ol>
+      <p id="stageMsg" class="stage-msg" role="status" aria-live="polite">Starting…</p>
+      <div class="bar" id="uploadBarWrap" hidden><div id="uploadBar" class="bar-fill"></div></div>
+      <p class="muted">Time so far: <span id="elapsed">0:00</span>. This can take a few minutes on CPU — you can leave this tab open.</p>
+    </section>
+
+    <section id="results" class="panel" hidden aria-labelledby="resTitle">
+      <div class="res-head">
+        <div>
+          <h2 id="resTitle">Your files are ready</h2>
+          <p id="resMeta" class="muted"></p>
+        </div>
+        <div class="res-actions">
+          <a id="zipBtn" class="btn primary" href="#">Download all (.zip)</a>
+          <button type="button" id="againBtn" class="btn ghost">Split another song</button>
+        </div>
+      </div>
+      <div id="trackList" class="track-list"></div>
+    </section>
+
+    <section id="errorBox" class="panel error" hidden role="alert" aria-labelledby="errTitle">
+      <h2 id="errTitle">That didn't work</h2>
+      <p id="errMsg"></p>
+      <p id="errHint" class="hint"></p>
+      <div class="res-actions">
+        <button type="button" id="retryBtn" class="btn primary">Try again</button>
+        <button type="button" id="lightBtn" class="btn ghost" hidden>Use the lighter model</button>
+        <button type="button" id="otherBtn" class="btn ghost">Choose another file</button>
+      </div>
+    </section>
+
+    <section id="emptyBox" class="panel" hidden>
+      <h2>No files were created</h2>
+      <p>The song finished, but nothing came out. Try a different song or model.</p>
+      <button type="button" id="emptyBtn" class="btn primary">Start over</button>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Your music is processed only on the machine running Split My Music. Finished files are deleted automatically after <span id="retention">24</span> hours.</p>
+    <p>Powered by <a href="https://github.com/nomadkaraoke/python-audio-separator" target="_blank" rel="noopener">python-audio-separator</a>. Models by Ultimate Vocal Remover contributors and Meta AI (Demucs). Please only process music you have the right to use.</p>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
