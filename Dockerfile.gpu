@@ -1,6 +1,6 @@
 # NVIDIA GPU image. Requires an NVIDIA driver and the NVIDIA Container Toolkit on the host.
 # NOTE: this image has NOT been run on NVIDIA hardware by the maintainers yet (see README).
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04 AS builder
+FROM nvidia/cuda:13.5.0-cudnn-runtime-ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1
 RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common \
@@ -18,7 +18,7 @@ RUN pip install torch --index-url https://download.pytorch.org/whl/cu126 \
     && pip install -r /tmp/req.txt \
     && pip install "audio-separator[gpu]>=0.48.0"
 
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:13.5.0-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
