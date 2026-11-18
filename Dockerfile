@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS builder
+FROM python:3.15-slim AS builder
 
 ENV PIP_NO_CACHE_DIR=1
 # diffq has no Linux wheel and must be compiled.
@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu \
     && pip install -r requirements.txt
 
-FROM python:3.12-slim
+FROM python:3.15-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
