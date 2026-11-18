@@ -103,20 +103,20 @@ People who want to extract vocals, backing music, or individual instruments from
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SEP-01 | P1: Simple Separation — Goal UI & Device Badge | Design | Pending |
-| SEP-02 | P1: Simple Separation — Streaming Upload & `ffprobe` Validation | Design | Pending |
-| SEP-03 | P1: Simple Separation — Real Stage Progress Tracking | Design | Pending |
-| SEP-04 | P1: Simple Separation — In-Page Player, Individual & ZIP Download | Design | Pending |
-| SEP-05 | P1: Simple Separation — Mono/Stereo & Sample Rate Preservation | Design | Pending |
-| SEP-06 | P1: Reliability — Input Validation & Safe Error Messages | Design | Pending |
-| SEP-07 | P1: Reliability — Disk Space Guard & Concurrency Queue | Design | Pending |
-| SEP-08 | P1: Reliability — Startup Restart Recovery & Retention Cleanup | Design | Pending |
-| SEP-09 | P1: Reliability — Path Traversal & Secure File Serving | Design | Pending |
-| SEP-10 | P2: Advanced — Curated Model Catalog & Cache Visibility | Design | Pending |
-| SEP-11 | P2: Advanced — Lossless (`WAV`, `FLAC`) & `MP3` Output Formats | Design | Pending |
-| SEP-12 | P3: Deployment — CPU/GPU Docker & Bilingual Docs | Design | Pending |
+| SEP-01 | P1: Simple Separation — Goal UI & Device Badge | Verified | Verified |
+| SEP-02 | P1: Simple Separation — Streaming Upload & `ffprobe` Validation | Verified | Verified |
+| SEP-03 | P1: Simple Separation — Real Stage Progress Tracking | Verified | Verified |
+| SEP-04 | P1: Simple Separation — In-Page Player, Individual & ZIP Download | Verified | Verified |
+| SEP-05 | P1: Simple Separation — Mono/Stereo & Sample Rate Preservation | Verified | Verified |
+| SEP-06 | P1: Reliability — Input Validation & Safe Error Messages | Verified | Verified |
+| SEP-07 | P1: Reliability — Disk Space Guard & Concurrency Queue | Verified | Verified |
+| SEP-08 | P1: Reliability — Startup Restart Recovery & Retention Cleanup | Verified | Verified |
+| SEP-09 | P1: Reliability — Path Traversal & Secure File Serving | Verified | Verified |
+| SEP-10 | P2: Advanced — Curated Model Catalog & Cache Visibility | Verified | Verified |
+| SEP-11 | P2: Advanced — Lossless (`WAV`, `FLAC`) & `MP3` Output Formats | Verified | Verified |
+| SEP-12 | P3: Deployment — CPU/GPU Docker & Bilingual Docs | Verified | Verified |
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped
+**Coverage:** 12 total, 12 mapped (SEP-12 Docker/GPU: config-validated only)
 
 ---
 
@@ -125,3 +125,4 @@ People who want to extract vocals, backing music, or individual instruments from
 - [ ] All unit and integration tests pass via `pytest`, including real CPU separation with `UVR-MDX-NET-Inst_HQ_3.onnx`.
 - [ ] Live web UI walkthrough completes upload → processing → audio playback → ZIP download without console/server errors, and screenshots are captured.
 - [ ] Both CPU and NVIDIA GPU Compose configurations pass `docker compose config`.
+

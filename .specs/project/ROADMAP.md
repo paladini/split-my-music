@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current Milestone:** Milestone 1 — Core Self-Hosted Separation Platform
-**Status:** In Progress
+**Status:**  Complete
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### Features
 
-**Audio Separation (`audio-separation`)** - IN PROGRESS
+**Audio Separation (`audio-separation`)** - COMPLETE (GPU and Docker runtime unverified; see validation.md)
 
 - Curated goal-based model catalog (`UVR-MDX-NET-Inst_HQ_3.onnx`, `Kim_Vocal_2.onnx`, `UVR_MDXNET_KARA_2.onnx`, `htdemucs.yaml`, `htdemucs_6s.yaml`, `model_bs_roformer_ep_317_sdr_12.9755.ckpt`)
 - Audio validation (`ffprobe`), mono/stereo & multi-channel normalization, sample-rate preservation
@@ -27,3 +27,4 @@
 - Optional directory watch / batch folder processing for homelab workflows
 - Waveform scrubbing preview inside the browser player
 - Custom model registry extension via local config file for power users
+
