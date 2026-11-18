@@ -4,6 +4,15 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 
 ## [Unreleased]
 
+### Security
+- Raised minimum versions of runtime and test dependencies (`fastapi` 0.165, `uvicorn` 0.54, `python-multipart` 0.0.34, `jinja2` 3.1.6, `soundfile` 0.14, `audioread` 3.1, `pytest` 9.2) to pick up upstream security fixes.
+- Upgraded all GitHub Actions to their current major versions (Node.js 24 runtime): `actions/checkout` v7, `actions/setup-python` v7, `docker/setup-buildx-action` v4, `docker/setup-qemu-action` v4, `docker/login-action` v4, `docker/metadata-action` v6, `docker/build-push-action` v7, `softprops/action-gh-release` v3, `peter-evans/dockerhub-description` v5.
+
+### Changed
+- GPU image now uses `nvidia/cuda:13.5.0-cudnn-runtime-ubuntu22.04` with PyTorch `cu132` wheels. This matches `onnxruntime-gpu` >= 1.32, which is built for CUDA 13. **Hosts need an NVIDIA driver 580 or newer**, and Maxwell, Pascal and Volta GPUs are no longer supported by CUDA 13.
+- Test client dependency switched from `httpx` to `httpx2`, because Starlette 1.10 deprecates `httpx` for `starlette.testclient`.
+- Dependabot now groups minor and patch updates and ignores Python base-image minor bumps, since `onnxruntime` has no Python 3.15 wheels yet.
+
 ## [1.0.0] - 2026-11-17
 
 ### Added
