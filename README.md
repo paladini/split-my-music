@@ -75,7 +75,7 @@ Open <http://localhost:7860>. The first time you run a model, it downloads once 
 
 ### Host prerequisites
 
-- An NVIDIA GPU with a recent host driver (`nvidia-smi` working on the host)
+- An NVIDIA GPU with a host driver that supports **CUDA 13** (driver **580 or newer**; `nvidia-smi` working on the host). CUDA 13 no longer supports Maxwell, Pascal or Volta GPUs.
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installed and configured for Docker
 
 ### Using Docker Compose override (prevents port conflicts)

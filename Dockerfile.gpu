@@ -1,6 +1,6 @@
-# NVIDIA GPU image. Requires an NVIDIA driver and the NVIDIA Container Toolkit on the host.
+# NVIDIA GPU image. Requires an NVIDIA driver >= 580 (CUDA 13) and the NVIDIA Container Toolkit on the host.
 # NOTE: this image has NOT been run on NVIDIA hardware by the maintainers yet (see README).
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04 AS builder
+FROM nvidia/cuda:13.5.0-cudnn-runtime-ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1
 RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common \
@@ -12,13 +12,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends software-proper
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /build
 COPY requirements.txt .
-# CUDA PyTorch + torchvision first, then everything except the CPU extra, then the GPU extra.
-RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 \
+# CUDA 13 PyTorch + torchvision first (cu132 wheels run on the CUDA 13.x base image via minor-version
+# compatibility), then everything except the CPU extra, then the GPU extra. onnxruntime-gpu >= 1.32 on PyPI
+# is built against CUDA 13 / cuDNN 9, so the base image must be CUDA 13.x for the CUDA provider to load.
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu132 \
     && grep -viE '^audio-separator' requirements.txt > /tmp/req.txt \
     && pip install -r /tmp/req.txt \
     && pip install "audio-separator[gpu]>=0.48.0"
 
-FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04
+FROM nvidia/cuda:13.5.0-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
