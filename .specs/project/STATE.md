@@ -71,6 +71,13 @@
 **Solution:** Use a multi-stage Docker build with `build-essential` in the builder stage (`Dockerfile` and `Dockerfile.gpu`) and copy `/opt/venv` into the slim runtime stage.
 **Prevents:** Bloated runtime images and Linux pip build failures.
 
+### L-004: Matching `torch` and `torchvision` Wheels on Linux
+
+**Context:** Ubuntu CI `real_model` tests failed inside `onnx2torch` with `RuntimeError: operator torchvision::nms does not exist`.
+**Problem:** Installing `torch` alone from the CPU/cu126 index left `torchvision` to be resolved from standard PyPI against the default CUDA torch build, creating a binary ABI mismatch.
+**Solution:** Always install `torch` and `torchvision` together from the exact same PyTorch wheel index (`cpu` or `cu126`) in `Dockerfile`, `Dockerfile.gpu`, and CI workflows.
+**Prevents:** Runtime `onnx2torch` / `torchvision` crashes in Linux containers.
+
 ---
 
 ## Quick Tasks Completed

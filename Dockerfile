@@ -8,8 +8,8 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /build
 COPY requirements.txt .
-# CPU-only PyTorch first: avoids pulling multi-GB CUDA wheels into the CPU image.
-RUN pip install torch --index-url https://download.pytorch.org/whl/cpu \
+# CPU-only PyTorch + torchvision together: avoids pulling mismatched CUDA torchvision wheels.
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu \
     && pip install -r requirements.txt
 
 FROM python:3.12-slim

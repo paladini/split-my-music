@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends software-proper
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /build
 COPY requirements.txt .
-# CUDA PyTorch first, then everything except the CPU extra, then the GPU extra.
-RUN pip install torch --index-url https://download.pytorch.org/whl/cu126 \
+# CUDA PyTorch + torchvision first, then everything except the CPU extra, then the GPU extra.
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 \
     && grep -viE '^audio-separator' requirements.txt > /tmp/req.txt \
     && pip install -r /tmp/req.txt \
     && pip install "audio-separator[gpu]>=0.48.0"
