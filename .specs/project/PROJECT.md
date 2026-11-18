@@ -21,7 +21,7 @@
 - Frontend: Semantic HTML5, Vanilla CSS3 (modern custom properties & responsive grid), Vanilla ES6 JavaScript (zero heavy build pipeline)
 - Storage: File-backed job manifest JSON + local persistent filesystem volumes (`/data/models`, `/data/jobs`)
 
-**Key dependencies:** `audio-separator` (>=0.48.0), `ffmpeg`/`ffprobe` (system binary), `python-multipart`, `soundfile`, `httpx`, `pytest`
+**Key dependencies:** `audio-separator` (>=0.48.0), `ffmpeg`/`ffprobe` (system binary), `python-multipart`, `soundfile`, `httpx2`, `pytest`
 
 ## Scope
 
