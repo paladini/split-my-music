@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gpu
-    image: split-my-music:gpu
+    image: paladini/split-my-music:gpu
     gpus: all
     environment:
       NVIDIA_VISIBLE_DEVICES: all

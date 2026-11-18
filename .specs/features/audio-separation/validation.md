@@ -29,8 +29,7 @@ Page load, goal/format/advanced controls rendering, file selection, stage progre
 
 ## Not verified (honest limits)
 
-- **NVIDIA GPU**: no GPU on the dev host. `Dockerfile.gpu` and `docker-compose.gpu.yml` only checked with `docker compose config`.
-- **Docker images (CPU and GPU) were never built or run**: the Docker daemon was not running.
+- **NVIDIA GPU**: no GPU on the dev host. `Dockerfile.gpu` and `docker-compose.gpu.yml` checked with `docker compose config` and wired in CI/release, not executed on NVIDIA hardware.
 - **Only `UVR-MDX-NET-Inst_HQ_3` was executed.** Kim Vocal 2, Karaoke 2, HTDemucs 4/6 stems and BS-RoFormer are configured from upstream metadata but not run.
 - Mobile layout, keyboard-only walkthrough, screen reader and contrast were not audited with tools (CSS follows WCAG-minded choices only).
 - Real music, long files, and performance/quality comparisons were not tested or measured (tests use synthetic tones).
@@ -40,4 +39,5 @@ Page load, goal/format/advanced controls rendering, file selection, stage progre
 ## Final result
 
 - `pytest -v`: **25 passed** (23 non-real + 2 real-model CPU), 0 failed, 0 skipped.
-- `docker compose config` OK for CPU and CPU+GPU override (single service, port 7860).
+- `docker compose config` OK for root and TrueNAS CPU and CPU+GPU override (single service, port 7860).
+- CPU Docker image (`paladini/split-my-music:latest`, built from multi-stage `Dockerfile`): built cleanly and passed live container smoke tests (`Health=healthy`, `/health` 200 OK with `ffmpeg_available: true`, `/api/config` 200 OK).

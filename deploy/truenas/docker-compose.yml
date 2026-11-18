@@ -2,7 +2,7 @@
 # GPU: also add the override file next to it (docker-compose.gpu.yml) and an image built from Dockerfile.gpu.
 services:
   split-my-music:
-    image: split-my-music:cpu
+    image: paladini/split-my-music:${IMAGE_TAG:-latest}
     container_name: split-my-music
     ports:
       - "7860:7860"

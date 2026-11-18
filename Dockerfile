@@ -1,8 +1,22 @@
+FROM python:3.12-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1
+# diffq has no Linux wheel and must be compiled.
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /build
+COPY requirements.txt .
+# CPU-only PyTorch first: avoids pulling multi-GB CUDA wheels into the CPU image.
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install -r requirements.txt
+
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
+    PATH="/opt/venv/bin:$PATH" \
     SPLIT_HOST=0.0.0.0 \
     SPLIT_PORT=7860 \
     SPLIT_MODEL_CACHE_DIR=/data/models \
@@ -12,10 +26,9 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY --from=builder /opt/venv /opt/venv
 
+WORKDIR /app
 COPY main.py ./
 COPY src ./src
 COPY static ./static

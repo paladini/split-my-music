@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current Milestone:** Milestone 1 — Core Self-Hosted Separation Platform
-**Status:**  Complete
+**Status:** Complete
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### Features
 
-**Audio Separation (`audio-separation`)** - COMPLETE (GPU and Docker runtime unverified; see validation.md)
+**Audio Separation (`audio-separation`)** - COMPLETE (CPU app + CPU Docker container verified; NVIDIA GPU Compose validated, physical GPU runtime unverified)
 
 - Curated goal-based model catalog (`UVR-MDX-NET-Inst_HQ_3.onnx`, `Kim_Vocal_2.onnx`, `UVR_MDXNET_KARA_2.onnx`, `htdemucs.yaml`, `htdemucs_6s.yaml`, `model_bs_roformer_ep_317_sdr_12.9755.ckpt`)
 - Audio validation (`ffprobe`), mono/stereo & multi-channel normalization, sample-rate preservation

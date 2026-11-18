@@ -1,11 +1,29 @@
 # NVIDIA GPU image. Requires an NVIDIA driver and the NVIDIA Container Toolkit on the host.
 # NOTE: this image has NOT been run on NVIDIA hardware by the maintainers yet (see README).
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive PIP_NO_CACHE_DIR=1
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends \
+       python3.12 python3.12-venv python3.12-dev build-essential \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3.12 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /build
+COPY requirements.txt .
+# CUDA PyTorch first, then everything except the CPU extra, then the GPU extra.
+RUN pip install torch --index-url https://download.pytorch.org/whl/cu126 \
+    && grep -viE '^audio-separator' requirements.txt > /tmp/req.txt \
+    && pip install -r /tmp/req.txt \
+    && pip install "audio-separator[gpu]>=0.48.0"
+
 FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
+    PATH="/opt/venv/bin:$PATH" \
     NVIDIA_VISIBLE_DEVICES=all \
     NVIDIA_DRIVER_CAPABILITIES=compute,utility \
     SPLIT_HOST=0.0.0.0 \
@@ -14,23 +32,16 @@ ENV DEBIAN_FRONTEND=noninteractive \
     SPLIT_JOBS_DIR=/data/jobs \
     TORCH_HOME=/data/models/torch
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      software-properties-common ffmpeg libsndfile1 \
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common \
     && add-apt-repository -y ppa:deadsnakes/ppa \
-    && apt-get update && apt-get install -y --no-install-recommends python3.12 python3.12-venv \
-    && rm -rf /var/lib/apt/lists/* \
-    && python3.12 -m venv /opt/venv
+    && apt-get update && apt-get install -y --no-install-recommends \
+       python3.12 ffmpeg libsndfile1 \
+    && apt-get purge -y software-properties-common && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/opt/venv/bin:$PATH"
+COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app
-COPY requirements.txt .
-# CUDA PyTorch first, then everything except the CPU extra, then the GPU extra.
-RUN pip install torch --index-url https://download.pytorch.org/whl/cu126 \
-    && grep -viE '^audio-separator' requirements.txt > /tmp/req.txt \
-    && pip install -r /tmp/req.txt \
-    && pip install "audio-separator[gpu]>=0.48.0"
-
 COPY main.py ./
 COPY src ./src
 COPY static ./static

@@ -10,7 +10,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: split-my-music:cpu
+    image: paladini/split-my-music:latest
     container_name: split-my-music
     ports:
       - "${SPLIT_PUBLISH_PORT:-7860}:7860"

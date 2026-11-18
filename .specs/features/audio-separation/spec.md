@@ -6,10 +6,10 @@ People who want to extract vocals, backing music, or individual instruments from
 
 ## Goals
 
-- [ ] Allow any user to upload an audio file, select a plain-English goal, monitor separation stages, listen in-browser, and download tracks individually or as a ZIP archive.
-- [ ] Enforce explicit, user-friendly error handling for invalid/corrupted files, oversized inputs, low disk space, model download failures, OOM/device failures, and server restarts.
-- [ ] Expose only curated, validated models and exact output tracks each model can produce, with persistent caching and clear CPU/GPU hardware guidance.
-- [ ] Provide clean, port-safe CPU and NVIDIA GPU Docker configurations and bilingual (EN / PT-BR) documentation.
+- [x] Allow any user to upload an audio file, select a plain-English goal, monitor separation stages, listen in-browser, and download tracks individually or as a ZIP archive.
+- [x] Enforce explicit, user-friendly error handling for invalid/corrupted files, oversized inputs, low disk space, model download failures, OOM/device failures, and server restarts.
+- [x] Expose only curated, validated models and exact output tracks each model can produce, with persistent caching and clear CPU/GPU hardware guidance.
+- [x] Provide clean, port-safe CPU and NVIDIA GPU Docker configurations and bilingual (EN / PT-BR) documentation.
 
 ## Out of Scope
 
@@ -103,26 +103,26 @@ People who want to extract vocals, backing music, or individual instruments from
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SEP-01 | P1: Simple Separation — Goal UI & Device Badge | Verified | Verified |
-| SEP-02 | P1: Simple Separation — Streaming Upload & `ffprobe` Validation | Verified | Verified |
-| SEP-03 | P1: Simple Separation — Real Stage Progress Tracking | Verified | Verified |
-| SEP-04 | P1: Simple Separation — In-Page Player, Individual & ZIP Download | Verified | Verified |
-| SEP-05 | P1: Simple Separation — Mono/Stereo & Sample Rate Preservation | Verified | Verified |
-| SEP-06 | P1: Reliability — Input Validation & Safe Error Messages | Verified | Verified |
-| SEP-07 | P1: Reliability — Disk Space Guard & Concurrency Queue | Verified | Verified |
-| SEP-08 | P1: Reliability — Startup Restart Recovery & Retention Cleanup | Verified | Verified |
-| SEP-09 | P1: Reliability — Path Traversal & Secure File Serving | Verified | Verified |
-| SEP-10 | P2: Advanced — Curated Model Catalog & Cache Visibility | Verified | Verified |
-| SEP-11 | P2: Advanced — Lossless (`WAV`, `FLAC`) & `MP3` Output Formats | Verified | Verified |
-| SEP-12 | P3: Deployment — CPU/GPU Docker & Bilingual Docs | Verified | Verified |
+| SEP-01 | P1: Simple Separation — Goal UI & Device Badge | Verified | ✅ Verified |
+| SEP-02 | P1: Simple Separation — Streaming Upload & `ffprobe` Validation | Verified | ✅ Verified |
+| SEP-03 | P1: Simple Separation — Real Stage Progress Tracking | Verified | ✅ Verified |
+| SEP-04 | P1: Simple Separation — In-Page Player, Individual & ZIP Download | Verified | ✅ Verified |
+| SEP-05 | P1: Simple Separation — Mono/Stereo & Sample Rate Preservation | Verified | ✅ Verified |
+| SEP-06 | P1: Reliability — Input Validation & Safe Error Messages | Verified | ✅ Verified |
+| SEP-07 | P1: Reliability — Disk Space Guard & Concurrency Queue | Verified | ✅ Verified |
+| SEP-08 | P1: Reliability — Startup Restart Recovery & Retention Cleanup | Verified | ✅ Verified |
+| SEP-09 | P1: Reliability — Path Traversal & Secure File Serving | Verified | ✅ Verified |
+| SEP-10 | P2: Advanced — Curated Model Catalog & Cache Visibility | Verified | ✅ Verified |
+| SEP-11 | P2: Advanced — Lossless (`WAV`, `FLAC`) & `MP3` Output Formats | Verified | ✅ Verified |
+| SEP-12 | P3: Deployment — CPU/GPU Docker & Bilingual Docs | Verified | ✅ Verified (CPU Docker built & smoke-tested; GPU Compose validated) |
 
-**Coverage:** 12 total, 12 mapped (SEP-12 Docker/GPU: config-validated only)
+**Coverage:** 12 total, 12 mapped (SEP-12: CPU Docker built & smoke-tested; NVIDIA GPU Compose config-validated only)
 
 ---
 
 ## Success Criteria
 
-- [ ] All unit and integration tests pass via `pytest`, including real CPU separation with `UVR-MDX-NET-Inst_HQ_3.onnx`.
-- [ ] Live web UI walkthrough completes upload → processing → audio playback → ZIP download without console/server errors, and screenshots are captured.
-- [ ] Both CPU and NVIDIA GPU Compose configurations pass `docker compose config`.
+- [x] All unit and integration tests pass via `pytest`, including real CPU separation with `UVR-MDX-NET-Inst_HQ_3.onnx`.
+- [x] Live web UI walkthrough completes upload → processing → audio playback → ZIP download without console/server errors, and screenshots are captured.
+- [x] Both CPU and NVIDIA GPU Compose configurations pass `docker compose config`, and the CPU Docker image (`paladini/split-my-music:latest`) passes container build and `/health` + `/api/config` smoke tests.
 

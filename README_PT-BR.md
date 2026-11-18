@@ -1,140 +1,203 @@
+<div align="center">
+
 # Split My Music
 
-> Separe uma música em **vocais, instrumental, bateria, baixo e mais** — no seu próprio servidor, com uma página web simples.
+**Separação de áudio com IA self-hosted — isole voz, acompanhamento musical, bateria, baixo, guitarra e piano de qualquer música em uma interface web simples e privada.**
 
-🇺🇸 [Read in English](README.md)
+[![CI](https://github.com/paladini/split-my-music/actions/workflows/ci.yml/badge.svg)](https://github.com/paladini/split-my-music/actions/workflows/ci.yml)
+[![Release](https://github.com/paladini/split-my-music/actions/workflows/release.yml/badge.svg)](https://github.com/paladini/split-my-music/actions/workflows/release.yml)
+[![Docker Hub](https://img.shields.io/docker/pulls/paladini/split-my-music?logo=docker&label=Docker%20Hub)](https://hub.docker.com/r/paladini/split-my-music)
+[![GitHub Release](https://img.shields.io/github/v/release/paladini/split-my-music)](https://github.com/paladini/split-my-music/releases)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-10b981.svg)](LICENSE)
 
-![Página principal do Split My Music](docs/screenshots/main-interface.png)
+[English](README.md) · [Docker Hub](https://hub.docker.com/r/paladini/split-my-music) · [Changelog](CHANGELOG.md) · [Segurança](SECURITY.md)
 
-O Split My Music é um app web pequeno e self-hosted. Você solta uma música, escolhe o que quer separar, escuta e baixa o resultado. Tudo roda na máquina onde você instalar: **sua música nunca é enviada para terceiros.** A separação em si é feita pela biblioteca open source [python-audio-separator](https://github.com/nomadkaraoke/python-audio-separator); este projeto adiciona uma interface amigável, uma fila de trabalhos segura e configurações Docker para CPU e GPU NVIDIA.
+</div>
 
-## Funcionalidades
+---
 
-- Upload por arrastar e soltar (MP3, WAV, FLAC, M4A, AAC, OGG, OPUS).
-- Três objetivos em linguagem simples: **Vocals & Music**, **Vocals / Drums / Bass / Other**, **Full Band (6 faixas, com guitarra e piano)**.
-- Só aparecem as faixas que o modelo escolhido realmente consegue gerar.
-- Etapas reais (envio → preparo → modelo → separação → salvar). Sem porcentagem inventada.
-- Escute cada faixa na página; baixe uma a uma ou em `.zip`.
-- Saída em **WAV** ou **FLAC** (sem perda) ou **MP3** (320 kbps). Mono continua mono e a taxa de amostragem de entrada é mantida (o MP3 usa a taxa suportada mais próxima).
-- Avançado: escolha outro modelo testado; veja se já foi baixado e o tamanho do primeiro download.
-- Modelos são baixados uma vez e ficam em um volume persistente.
-- Seguro por padrão: limites de tamanho/duração, uma música por vez, fila limitada, checagem de disco, limpeza automática e nenhum stack trace para o usuário.
-- Responsivo, navegável por teclado, com rótulos para leitores de tela.
+![Interface principal do Split My Music](docs/screenshots/main-interface.png)
+
+O **Split My Music** é uma aplicação web leve e self-hosted baseada na biblioteca open source [`python-audio-separator`](https://github.com/nomadkaraoke/python-audio-separator). Você escolhe ou arrasta uma música, seleciona o que deseja separar, escuta cada faixa na própria página e baixa os arquivos individualmente ou em um único `.zip`.
+
+Tudo acontece localmente no seu servidor, computador pessoal, homelab ou NAS — **suas músicas nunca são enviadas para servidores externos.**
+
+## Principais funcionalidades
+
+- **Linguagem simples, sem jargões:** escolha entre **Vocals & Music**, **Vocals, Drums, Bass & Other** ou **Full Band (6 Tracks)**, com opções avançadas recolhidas para quem quiser escolher modelos específicos.
+- **Opções fiéis ao modelo:** a interface mostra apenas as faixas que o modelo selecionado realmente produz.
+- **Etapas reais de processamento:** acompanhamento transparente (`Upload` → `Prepare audio` → `Get the AI model` → `Separate` → `Save files`), sem porcentagens inventadas.
+- **Player integrado e download em lote:** escute as faixas geradas na própria página e baixe individualmente ou em `.zip`.
+- **Formatos sem perda e compactos:** exporte em **WAV**, **FLAC** (sem perda) ou **MP3** (320 kbps), preservando canais mono/estéreo e taxa de amostragem original (MP3 usa a taxa MPEG mais próxima).
+- **Cache persistente de modelos:** cada modelo é baixado apenas na primeira utilização e mantido em volume persistente (`/data/models`).
+- **Confiabilidade:** fila limitada (`1` trabalho por vez por padrão), checagem prévia de espaço em disco, recuperação automática após reinício do servidor, limpeza programada e mensagens de erro claras sem exposição de stack traces.
 
 ![Resultados com players de áudio](docs/screenshots/results-player.png)
 
-## Início rápido (Docker, CPU)
+---
+
+## Início rápido (Docker — CPU)
+
+### Opção A: Imagem pronta do Docker Hub
 
 ```bash
-git clone <este repositório>
-cd split-my-music
-docker compose up -d --build
+docker run -d \
+  --name split-my-music \
+  -p 7860:7860 \
+  -v split-models:/data/models \
+  -v split-jobs:/data/jobs \
+  --restart unless-stopped \
+  paladini/split-my-music:latest
 ```
 
-Abra <http://localhost:7860>. Na primeira vez que cada modelo é usado ele é baixado (50–80 MB nos modelos padrão).
+### Opção B: Docker Compose (recomendado para homelab)
 
-- Os modelos ficam no volume Docker `model-cache`.
-- Os resultados ficam em `./data/jobs` no host e são apagados automaticamente após 24 horas.
+```bash
+git clone https://github.com/paladini/split-my-music.git
+cd split-my-music
+docker compose up -d
+```
 
-## Início rápido (GPU NVIDIA)
+Acesse <http://localhost:7860>. Na primeira execução de um modelo, ele é baixado uma única vez (~50–80 MB para os modelos padrão) para o volume `model-cache`. Os resultados ficam em `./data/jobs` e são removidos automaticamente após 24 horas.
 
-Requisitos do host: GPU NVIDIA, driver NVIDIA recente e o [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) configurado no Docker.
+---
+
+## Início rápido (Docker — GPU NVIDIA)
+
+### Pré-requisitos no host
+
+- GPU NVIDIA com driver atualizado (`nvidia-smi` funcionando no host)
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) instalado e configurado para o Docker
+
+### Usando o override do Docker Compose (evita conflito de porta)
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
 ```
 
-O arquivo de override **substitui** o serviço de CPU, então só um contêiner usa a porta 7860. Não inicie CPU e GPU ao mesmo tempo.
+O arquivo `docker-compose.gpu.yml` **substitui** o serviço CPU no mesmo nome e porta (`7860`), garantindo que CPU e GPU nunca sejam iniciados simultaneamente na mesma porta.
 
-> ⚠️ **Status honesto:** a imagem GPU e o override foram validados apenas com `docker compose config`. **Não foram executados em hardware NVIDIA** (e as imagens Docker também não foram construídas) pelo autor. O caminho de CPU foi testado ponta a ponta fora do Docker. Por favor, reporte problemas. Apple Silicon, AMD e Intel **não** são suportados dentro destes contêineres.
-
-O selo no topo mostra o dispositivo detectado (`CPU` ou `NVIDIA GPU (...)`) e só indica GPU quando o PyTorch enxerga CUDA.
-
-## Atualização
+Ou execute diretamente a tag GPU:
 
 ```bash
-git pull
-docker compose up -d --build        # adicione o -f ... gpu para GPU
+docker run -d \
+  --name split-my-music \
+  --gpus all \
+  -p 7860:7860 \
+  -v split-models:/data/models \
+  -v split-jobs:/data/jobs \
+  --restart unless-stopped \
+  paladini/split-my-music:gpu
 ```
 
-Modelos e resultados ficam em volumes e sobrevivem às atualizações.
+Modelos prontos para **TrueNAS SCALE / NAS** estão em [`deploy/truenas/`](deploy/truenas/).
 
-## Modelos
+> [!NOTE]
+> **Status honesto de validação:**
+> - **CPU e contêiner Docker CPU:** construídos e validados ponta a ponta — a imagem CPU (`paladini/split-my-music:latest`) passou no `HEALTHCHECK`, `/health` e `/api/config`, e a separação real em CPU com `UVR-MDX-NET-Inst_HQ_3.onnx` mais o fluxo completo no navegador foram executados com sucesso.
+> - **GPU NVIDIA:** `Dockerfile.gpu` e `docker-compose.gpu.yml` foram validados com `docker compose config` e integrados ao CI/CD, mas **ainda não foram executados em hardware NVIDIA físico** pelo autor.
+> - **Apple Silicon / AMD / Intel dentro do Docker:** não possuem aceleração nestes contêineres Linux.
 
-Somente estes modelos testados são expostos (nomes do python-audio-separator):
+O selo no cabeçalho da interface mostra `CPU` ou `NVIDIA GPU (...)` apenas quando o PyTorch detecta CUDA ativo em tempo de execução.
 
-| Objetivo | Modelo | Arquivos gerados | Primeiro download | Observações |
-|---|---|---|---|---|
-| Vocals & Music (padrão) | UVR-MDX-NET-Inst_HQ_3 | Vocals, Music | ~64 MB | **Testado em CPU aqui** |
-| Vocals & Music | Kim_Vocal_2 | Vocals, Music | ~64 MB | não executado nos testes |
-| Vocals & Music | UVR_MDXNET_KARA_2 | Vocals, Music | ~50 MB | mantém backing vocals em Music; não executado nos testes |
-| 4 faixas | htdemucs | Vocals, Drums, Bass, Other | ~80 MB | não executado nos testes |
-| 6 faixas | htdemucs_6s | + Guitar, Piano | ~53 MB | guitarra/piano podem vazar; não executado nos testes |
-| Vocals & Music | BS-RoFormer (ep 317) | Vocals, Music | ~610 MB | muito lento em CPU; GPU recomendada; não executado nos testes |
+### Atualização
 
-Apenas o modelo padrão foi realmente executado nos testes automatizados. Os demais foram configurados a partir da lista e dos nomes de arquivo da própria biblioteca, mas não foram executados aqui. Os tamanhos vêm dos servidores dos modelos na data de escrita. Qualidade e velocidade **não foram medidas**.
+```bash
+docker compose pull && docker compose up -d
+# Ou, a partir do código-fonte:
+git pull
+docker compose up -d --build        # adicione -f docker-compose.gpu.yml para GPU NVIDIA
+```
 
-## Limites e formatos
+---
 
-| Configuração (variável) | Padrão |
-|---|---|
-| `SPLIT_MAX_UPLOAD_MB` | 200 |
-| `SPLIT_MAX_DURATION_MINUTES` | 20 |
-| `SPLIT_MAX_CONCURRENT_JOBS` | 1 |
-| `SPLIT_MAX_QUEUE_SIZE` | 5 |
-| `SPLIT_MIN_FREE_DISK_MB` | 500 (mais o tamanho do modelo se ainda não baixado) |
-| `SPLIT_RETENTION_HOURS` | 24 |
-| `SPLIT_MAX_STORED_JOBS` | 20 |
-| `SPLIT_MODEL_CACHE_DIR` / `SPLIT_JOBS_DIR` | `./data/models` / `./data/jobs` (`/data/...` no Docker) |
-| `SPLIT_HOST` / `SPLIT_PORT` / `SPLIT_LOG_LEVEL` | `0.0.0.0` / `7860` / `INFO` |
+## Modelos disponíveis
 
-Arquivos com mais de 2 canais são convertidos para estéreo antes do processamento. Se o servidor reiniciar durante um trabalho, ele é marcado como interrompido e você pode iniciá-lo de novo. A limpeza remove apenas trabalhos finalizados mais antigos que o tempo de retenção (ou acima do limite armazenado), nunca os em andamento.
+| Objetivo | Modelo (`python-audio-separator`) | Saídas | Primeiro download | Recomendação | Status de teste |
+| --- | --- | --- | --- | --- | --- |
+| **Vocals & Music** *(padrão)* | `UVR-MDX-NET-Inst_HQ_3.onnx` | Vocals, Music | ~64 MB | Rápido em CPU e GPU | **Executado ponta a ponta em CPU** |
+| **Vocals & Music** *(clareza vocal)* | `Kim_Vocal_2.onnx` | Vocals, Music | ~64 MB | Rápido em CPU e GPU | Validado no catálogo; não executado no CI |
+| **Vocals & Music** *(karaoke)* | `UVR_MDXNET_KARA_2.onnx` | Vocals, Music | ~50 MB | Rápido em CPU e GPU (mantém backing vocals em Music) | Validado no catálogo; não executado no CI |
+| **4 faixas (Instrumentos)** | `htdemucs.yaml` | Vocals, Drums, Bass, Other | ~80 MB | Funciona em CPU e GPU | Validado no catálogo; não executado no CI |
+| **6 faixas (Banda completa)** | `htdemucs_6s.yaml` | Vocals, Drums, Bass, Guitar, Piano, Other | ~53 MB | Funciona em CPU e GPU *(guitarra/piano podem vazar)* | Validado no catálogo; não executado no CI |
+| **Vocals & Music** *(estúdio)* | `model_bs_roformer_ep_317_sdr_12.9755.ckpt` | Vocals, Music | ~610 MB | **GPU recomendada** *(muito lento em CPU)* | Validado no catálogo; não executado no CI |
 
-## Privacidade e segurança
+Os tamanhos acima referem-se aos arquivos nos repositórios de origem na data de publicação. Velocidade e qualidade não foram comparadas por benchmark.
 
-- O processamento acontece no servidor onde você instalou o app. Os arquivos enviados são apagados assim que o trabalho termina; os resultados ficam até o fim da retenção.
-- O único tráfego de saída é o download dos arquivos de modelo (GitHub / hosts de modelos) na primeira vez que um modelo é usado.
-- Nomes de arquivo nunca viram caminhos; nenhum comando de shell é montado com dados do usuário; os resultados só são servidos por URLs verificadas por trabalho.
-- **Não há login.** O app é pensado para seu computador, rede local ou NAS. **Não** exponha na internet como está. Se precisar, use um proxy reverso com HTTPS e autenticação e revise os limites de upload.
-- Processe apenas músicas que você tem direito de usar.
+### Formatos suportados
+
+- **Entrada:** `MP3`, `WAV`, `FLAC`, `M4A`, `AAC`, `OGG`, `OPUS` (áudio com mais de 2 canais é convertido para estéreo antes da separação).
+- **Saída:** `WAV` (sem perda, `pcm_s16le`), `FLAC` (sem perda compactado) e `MP3` (320 kbps).
+
+---
+
+## Configuração (Variáveis de Ambiente)
+
+| Variável | Padrão | Descrição |
+| --- | --- | --- |
+| `SPLIT_HOST` / `SPLIT_PORT` | `0.0.0.0` / `7860` | Endereço e porta do servidor |
+| `SPLIT_MODEL_CACHE_DIR` | `./data/models` (`/data/models` no Docker) | Diretório persistente dos modelos |
+| `SPLIT_JOBS_DIR` | `./data/jobs` (`/data/jobs` no Docker) | Diretório de trabalhos e resultados |
+| `SPLIT_MAX_UPLOAD_MB` | `200` | Limite máximo de upload (MB) |
+| `SPLIT_MAX_DURATION_MINUTES` | `20` | Duração máxima do áudio (minutos) |
+| `SPLIT_MAX_CONCURRENT_JOBS` | `1` | Separações simultâneas (`1` evita esgotar RAM/VRAM) |
+| `SPLIT_MAX_QUEUE_SIZE` | `5` | Tamanho máximo da fila antes de responder HTTP `429` |
+| `SPLIT_MIN_FREE_DISK_MB` | `500` | Espaço mínimo livre em disco (+ tamanho do modelo se não baixado) |
+| `SPLIT_RETENTION_HOURS` | `24` | Horas de retenção dos resultados concluídos |
+| `SPLIT_MAX_STORED_JOBS` | `20` | Limite máximo de trabalhos finalizados mantidos em disco |
+| `SPLIT_CHUNK_DURATION_SECONDS` | `300` | Janela de fatiamento para arquivos longos |
+| `SPLIT_LOG_LEVEL` | `INFO` | Nível de logs (`DEBUG`, `INFO`, `WARNING`, `ERROR`) |
+
+---
+
+## Privacidade e Segurança
+
+- **Processamento local:** todo o áudio é processado exclusivamente na máquina onde o Split My Music está rodando. Arquivos enviados são removidos ao final do trabalho.
+- **Tráfego externo mínimo:** acesso à internet ocorre apenas para baixar um modelo na primeira vez em que ele é utilizado.
+- **Proteções implementadas:** nomes de arquivos enviados são sanitizados e nunca viram caminhos no disco; nenhum comando de shell é montado com dados do usuário (`shell=False`); os downloads passam por validação de trabalho e caminho; stack traces ficam apenas nos logs do servidor.
+- **Uso em rede local vs. exposição pública:** não há sistema de login. Use em localhost, rede doméstica ou homelab. **Não exponha diretamente na internet sem um proxy reverso com HTTPS, autenticação e revisão dos limites.**
+- Processe apenas áudios sobre os quais você possui direito de uso.
+
+---
 
 ## Solução de problemas
 
-- **"Falha no download do modelo"** – o servidor precisa de internet para o GitHub na primeira vez e de espaço em disco. Tente novamente.
-- **"Memória insuficiente"** – use o modelo padrão ou uma música mais curta.
-- **Selo mostra CPU com GPU instalada** – o contêiner não enxerga a GPU. Verifique `nvidia-smi` no host e o NVIDIA Container Toolkit.
-- **"Servidor ocupado"** – a fila está cheia; aguarde uma música terminar.
-- **Contêiner unhealthy** – `docker compose logs split-my-music`; o health check é `GET /health`.
-- Lentidão em CPU é normal para músicas longas; modelos maiores são bem mais lentos.
+- **Falha ao baixar modelo:** verifique se o servidor tem acesso ao GitHub Releases e espaço livre suficiente em disco.
+- **Falta de memória (OOM):** mantenha `SPLIT_MAX_CONCURRENT_JOBS=1`, use faixas menores ou utilize o modelo padrão `UVR-MDX-NET-Inst_HQ_3`.
+- **Selo mostra CPU mesmo com GPU NVIDIA:** confira `nvidia-smi` no host, o NVIDIA Container Toolkit e se o compose override `docker-compose.gpu.yml` foi usado.
+- **Servidor ocupado (`429`):** aguarde os trabalhos atuais terminarem ou aumente `SPLIT_MAX_QUEUE_SIZE`.
+- **Contêiner unhealthy:** confira `docker compose logs split-my-music` e acesse `GET /health`.
 
-## Desenvolvimento
+---
 
-Requer Python 3.12 e FFmpeg.
+## Desenvolvimento e Testes
+
+Requer **Python 3.12** e **FFmpeg** (`ffmpeg` + `ffprobe` no `PATH`).
 
 ```bash
 python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.txt     # Windows: .venv\Scripts\pip
-.venv/bin/python main.py
+.venv/bin/pip install -r requirements.txt    # Windows: .venv\Scripts\pip install -r requirements.txt
+.venv/bin/python main.py                     # Windows: .venv\Scripts\python main.py
 ```
 
-Testes:
+Executar os testes:
 
 ```bash
-pytest -m "not real_model"     # rápidos: unitários + integração com motor falso
-pytest -m real_model           # baixa ~64 MB e roda o modelo real em CPU
-pytest                         # tudo
+pytest -m "not real_model"   # Testes rápidos (23 testes unitários e de integração)
+pytest -m real_model         # Baixa ~64 MB na 1ª execução e roda separação real em CPU (2 testes)
+pytest -v                    # Suíte completa (25 testes)
 ```
 
-Estrutura: `src/core/engine.py` é o único ponto que fala com o python-audio-separator; `catalog.py` lista os modelos testados; `jobs.py` cuida da fila; `routes.py` é a API web. As specs ficam em `.specs/`.
+---
 
-## Licença e créditos
+## Licença e Créditos
 
-Código: [MIT](LICENSE). Os pesos dos modelos e as dependências têm **licenças próprias** e são baixados em tempo de execução, não distribuídos aqui:
-
-- [python-audio-separator](https://github.com/nomadkaraoke/python-audio-separator) (MIT) por Andrew Beveridge / nomadkaraoke. Pede que projetos que usam modelos UVR deem crédito ao UVR e seus desenvolvedores.
-- [Ultimate Vocal Remover](https://github.com/Anjok07/ultimatevocalremovergui) por Anjok07 e aufr33 e os modelos MDX-Net (KimberleyJSN, Kuielab e outros).
-- [Demucs](https://github.com/facebookresearch/demucs) da Meta AI Research (MIT).
-- Implementações BS-RoFormer de lucidrains e pesos de ViperX.
-- FFmpeg (LGPL/GPL conforme o build), PyTorch, ONNX Runtime, FastAPI.
-
-As notas de licença no app e acima são um resumo de boa-fé das páginas dos projetos; verifique a licença de cada arquivo de modelo antes de redistribuí-lo. Inspirado no layout do [voice-separator-demucs](https://github.com/paladini/voice-separator-demucs).
+- **Código do Split My Music:** Licença [MIT](LICENSE).
+- **Modelos e bibliotecas de terceiros:** baixados em tempo de execução e sujeitos às suas respectivas licenças — veja [THIRD_PARTY.md](THIRD_PARTY.md):
+  - [`python-audio-separator`](https://github.com/nomadkaraoke/python-audio-separator) (MIT) — Andrew Beveridge / nomadkaraoke.
+  - [Ultimate Vocal Remover](https://github.com/Anjok07/ultimatevocalremovergui) (Anjok07 & aufr33) e contribuidores dos modelos MDX-Net.
+  - [Demucs](https://github.com/facebookresearch/demucs) — Meta AI Research (MIT).
+  - BS-RoFormer (lucidrains & ViperX).
+  - FFmpeg, PyTorch, ONNX Runtime, FastAPI e Uvicorn.
+- Visual e fluxo inspirados no projeto [`voice-separator-demucs`](https://github.com/paladini/voice-separator-demucs).

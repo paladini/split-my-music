@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-11-17T17:06:00-03:00
-**Current Work:** Milestone 1 (`audio-separation`) — Initializing specifications
+**Last Updated:** 2026-11-17T21:46:00-03:00
+**Current Work:** Milestone 1 (`audio-separation`) — Complete & Releasing v1.0.0
 
 ---
 
@@ -39,12 +39,12 @@
 
 ## Active Blockers
 
-### B-001: No Local NVIDIA GPU or Active Docker Daemon on Development Host
+### B-001: No Local NVIDIA GPU on Development Host
 
 **Discovered:** 2026-11-17
-**Impact:** Cannot execute live CUDA GPU inference or build/run Docker containers on this host during development.
-**Workaround:** Validate Compose YAML configs structurally with `docker compose config`; run full real-model separation and browser E2E verification on CPU.
-**Resolution:** Document clearly in README and final delivery report that CPU paths were tested live while NVIDIA GPU and Docker runtime execution remain structurally validated and require testing on an NVIDIA host.
+**Impact:** Cannot execute live CUDA GPU inference on this host (Docker Desktop daemon was later started, allowing full CPU Docker build & smoke testing).
+**Workaround:** Built and smoke-tested CPU Docker image locally (`paladini/split-my-music:latest`); validated `Dockerfile.gpu` and `docker-compose.gpu.yml` via `docker compose config` and wired GPU build into GitHub Actions.
+**Resolution:** Document clearly in README and release notes that CPU + CPU Docker were verified live while NVIDIA GPU execution requires testing on an NVIDIA GPU host.
 
 ---
 
@@ -56,6 +56,20 @@
 **Problem:** `python --version` fails with exit code 1.
 **Solution:** Create `.venv` explicitly using `py -3.12 -m venv .venv` and invoke `.\.venv\Scripts\python.exe`.
 **Prevents:** Environment confusion during automated script and pytest execution.
+
+### L-002: Missing `audioread` Transitive Dependency in `audio-separator==0.48.0`
+
+**Context:** `librosa>=1.0.1` dropped `audioread` as a hard dependency, while `audio_separator.separator.uvr_lib_v5.spec_utils` still imports `audioread`.
+**Problem:** Importing `Separator` fails with `ModuleNotFoundError: No module named 'audioread'`.
+**Solution:** Pin `audioread>=3.0.1` explicitly in `requirements.txt`.
+**Prevents:** Runtime import crash on fresh installs and Docker builds.
+
+### L-003: Compiling `diffq` in Linux Docker Builds
+
+**Context:** Building `Dockerfile` on `python:3.12-slim` (Linux x86_64) failed initially when building the wheel for `diffq` (dependency of `audio-separator`).
+**Problem:** `diffq` has no prebuilt Linux Python 3.12 wheel and requires a C/C++ toolchain.
+**Solution:** Use a multi-stage Docker build with `build-essential` in the builder stage (`Dockerfile` and `Dockerfile.gpu`) and copy `/opt/venv` into the slim runtime stage.
+**Prevents:** Bloated runtime images and Linux pip build failures.
 
 ---
 
@@ -75,7 +89,9 @@
 
 ## Todos
 
-- [ ] Execute Phase 2–7 implementation and verify all unit, integration, and real CPU E2E tests.
+- [x] Execute Phase 2–7 implementation and verify all unit, integration, and real CPU E2E tests.
+- [x] Build and smoke-test CPU Docker image (`paladini/split-my-music:latest`).
+- [x] Publish GitHub repository, CI/CD pipelines, Docker Hub image, and v1.0.0 release.
 
 ---
 

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install FFmpeg and libsndfile
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg libsndfile1
+      - name: Install dependencies (CPU PyTorch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+      - name: Unit and integration tests (fake engine)
+        run: pytest -m "not real_model" -v
+      - name: Real model test (downloads ~64 MB, CPU)
+        run: pytest -m real_model -v
+      - name: Validate Compose files
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.gpu.yml config --quiet
+
+  docker-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build CPU image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          load: true
+          tags: split-my-music:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test (health endpoint)
+        run: |
+          docker run -d --name smm -p 7860:7860 split-my-music:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:7860/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs smm
+          exit 1
+
+  docker-gpu-build:
+    # Build only: GitHub runners have no NVIDIA GPU, so the GPU image is never run here.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build GPU image (not executed)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.gpu
+          push: false
+          tags: split-my-music:ci-gpu
+          cache-from: type=gha,scope=gpu
+          cache-to: type=gha,mode=max,scope=gpu

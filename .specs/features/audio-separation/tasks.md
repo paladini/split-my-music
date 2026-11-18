@@ -1,7 +1,7 @@
 # Audio Separation Tasks
 
 **Design**: `.specs/features/audio-separation/design.md`
-**Status**: Approved
+**Status**: Done
 
 ---
 
@@ -30,9 +30,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: None
 **Requirement**: SEP-07, SEP-12
 **Done when**:
-- [ ] `.venv` created on Python 3.12 with all dependencies installed
-- [ ] Settings load defaults and environment variable overrides accurately
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_catalog_and_config.py -v`
+- [x] `.venv` created on Python 3.12 with all dependencies installed
+- [x] Settings load defaults and environment variable overrides accurately
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_catalog_and_config.py -v`
 **Tests**: unit
 **Gate**: quick
 
@@ -44,9 +44,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T1
 **Requirement**: SEP-06, SEP-10, SEP-11
 **Done when**:
-- [ ] All curated models map accurately to `python-audio-separator` filenames and canonical track keys
-- [ ] Invalid model IDs or unsupported output selections raise `AppError`
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_catalog_and_config.py -v`
+- [x] All curated models map accurately to `python-audio-separator` filenames and canonical track keys
+- [x] Invalid model IDs or unsupported output selections raise `AppError`
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_catalog_and_config.py -v`
 **Tests**: unit
 **Gate**: quick
 
@@ -58,9 +58,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T2
 **Requirement**: SEP-02, SEP-05, SEP-06, SEP-09
 **Done when**:
-- [ ] Invalid/corrupted/empty/oversized/too-long inputs raise structured `AppError`
-- [ ] Mono (48 kHz), stereo (44.1 kHz), and 5.1 surround fixtures verified via `ffmpeg`/`ffprobe`
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_media_and_security.py -v`
+- [x] Invalid/corrupted/empty/oversized/too-long inputs raise structured `AppError`
+- [x] Mono (48 kHz), stereo (44.1 kHz), and 5.1 surround fixtures verified via `ffmpeg`/`ffprobe`
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_media_and_security.py -v`
 **Tests**: unit
 **Gate**: quick
 
@@ -72,9 +72,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T2
 **Requirement**: SEP-03, SEP-06, SEP-10, SEP-11
 **Done when**:
-- [ ] Engine reports accurate hardware state and cache status
-- [ ] Mocked unit tests verify stage transitions, single-stem optimization, and OOM/download/export errors
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_engine_unit.py -v`
+- [x] Engine reports accurate hardware state and cache status
+- [x] Mocked unit tests verify stage transitions, single-stem optimization, and OOM/download/export errors
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit/test_engine_unit.py -v`
 **Tests**: unit
 **Gate**: quick
 
@@ -86,10 +86,10 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T2
 **Requirement**: SEP-03, SEP-04, SEP-07, SEP-08
 **Done when**:
-- [ ] Concurrent jobs queue cleanly and reject overflow with `SERVER_BUSY`
-- [ ] Startup recovery converts active/queued jobs to `INTERRUPTED_BY_RESTART`
-- [ ] Expired jobs are cleaned without touching active jobs
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/integration/test_jobs_and_recovery.py -v`
+- [x] Concurrent jobs queue cleanly and reject overflow with `SERVER_BUSY`
+- [x] Startup recovery converts active/queued jobs to `INTERRUPTED_BY_RESTART`
+- [x] Expired jobs are cleaned without touching active jobs
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/integration/test_jobs_and_recovery.py -v`
 **Tests**: integration
 **Gate**: full
 
@@ -101,9 +101,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T3, T4, T5
 **Requirement**: SEP-01, SEP-02, SEP-04, SEP-06, SEP-09
 **Done when**:
-- [ ] Streaming upload enforces `MAX_UPLOAD_MB` without buffering entire file in memory
-- [ ] File endpoint rejects path traversal and unowned filenames
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit tests/integration/test_api_routes.py tests/integration/test_jobs_and_recovery.py -v`
+- [x] Streaming upload enforces `MAX_UPLOAD_MB` without buffering entire file in memory
+- [x] File endpoint rejects path traversal and unowned filenames
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest tests/unit tests/integration/test_api_routes.py tests/integration/test_jobs_and_recovery.py -v`
 **Tests**: integration
 **Gate**: full
 
@@ -115,9 +115,9 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T6
 **Requirement**: SEP-01, SEP-03, SEP-04, SEP-10, SEP-11
 **Done when**:
-- [ ] Page renders cleanly with no "stem" jargon in primary controls
-- [ ] Keyboard navigation and contrast comply with WCAG AA
-- [ ] End-to-end browser verification passes with real screenshots captured
+- [x] Page renders cleanly with no "stem" jargon in primary controls
+- [x] Keyboard navigation and contrast comply with WCAG AA
+- [x] End-to-end browser verification passes with real screenshots captured
 **Tests**: e2e (browser walkthrough)
 **Gate**: full
 
@@ -129,8 +129,8 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T6
 **Requirement**: SEP-02, SEP-04, SEP-05, SEP-10, SEP-11
 **Done when**:
-- [ ] Real CPU model separation succeeds end-to-end and passes all assertions
-- [ ] Gate check passes: `.\.venv\Scripts\python.exe -m pytest -v`
+- [x] Real CPU model separation succeeds end-to-end and passes all assertions
+- [x] Gate check passes: `.\.venv\Scripts\python.exe -m pytest -v`
 **Tests**: integration
 **Gate**: build
 
@@ -142,8 +142,8 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T6
 **Requirement**: SEP-12
 **Done when**:
-- [ ] `docker compose -f docker-compose.yml config` succeeds
-- [ ] `docker compose -f docker-compose.yml -f docker-compose.gpu.yml config` succeeds with a single service on port 7860
+- [x] `docker compose -f docker-compose.yml config` succeeds
+- [x] `docker compose -f docker-compose.yml -f docker-compose.gpu.yml config` succeeds with a single service on port 7860
 **Tests**: none (config verification via `docker compose config`)
 **Gate**: build
 
@@ -155,8 +155,8 @@ T2 ──┼→ T4 [P] ─┼──→ T6
 **Depends on**: T7, T8, T9
 **Requirement**: SEP-01 through SEP-12
 **Done when**:
-- [ ] Real screenshots embedded and verified in both READMEs
-- [ ] All specs/tasks/validation updated and full test suite passes
+- [x] Real screenshots embedded and verified in both READMEs
+- [x] All specs/tasks/validation updated and full test suite passes
 **Tests**: build gate
 **Gate**: build
 
