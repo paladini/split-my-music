@@ -67,7 +67,7 @@ Acesse <http://localhost:7860>. Na primeira execução de um modelo, ele é baix
 
 ### Pré-requisitos no host
 
-- GPU NVIDIA com driver atualizado (`nvidia-smi` funcionando no host)
+- GPU NVIDIA com driver compatível com **CUDA 13** (driver **580 ou mais recente**; `nvidia-smi` funcionando no host). O CUDA 13 não suporta mais GPUs Maxwell, Pascal ou Volta.
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) instalado e configurado para o Docker
 
 ### Usando o override do Docker Compose (evita conflito de porta)

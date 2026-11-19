@@ -20,7 +20,7 @@ Open `http://localhost:7860`. Models download once on first use (~50–80 MB for
 
 ## NVIDIA GPU
 
-Requires an NVIDIA GPU, recent NVIDIA host driver, and the NVIDIA Container Toolkit:
+Requires an NVIDIA GPU, an NVIDIA host driver with CUDA 13 support (580 or newer), and the NVIDIA Container Toolkit:
 
 ```bash
 docker run -d \
@@ -40,7 +40,7 @@ docker run -d \
 | Tag | Variant | Architecture |
 | --- | --- | --- |
 | `latest`, `cpu`, `1.0.0`, `1.0` | CPU (`Dockerfile`) | `linux/amd64` |
-| `gpu`, `1.0.0-gpu`, `1.0-gpu` | NVIDIA CUDA 12.6 (`Dockerfile.gpu`) | `linux/amd64` |
+| `gpu`, `1.0.0-gpu`, `1.0-gpu` | NVIDIA CUDA 13.5 (`Dockerfile.gpu`) | `linux/amd64` |
 
 ## Configuration
 
